@@ -12,10 +12,17 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
     string name = req.Query["name"];
 
     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-    dynamic data = JsonConvert.DeserializeObject(requestBody);
-    name = name ?? data?.name;
+    dynamic registrationRequest = JsonConvert.DeserializeObject<RegistrationRequest> (requestBody);
+    var email = registrationRequest?.Email;
+    var userName = registrationRequest?.UserName;
 
-    return name != null
-        ? (ActionResult)new OkObjectResult($"Hello, {name}")
+    return (email != null && userName != null)
+        ? (ActionResult)new OkObjectResult($"Hello, {userName} with email {email}")
         : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+}
+
+public class RegistrationRequest
+{
+    public string Email { get; set; }   
+    public string UserName {get;set;}
 }
