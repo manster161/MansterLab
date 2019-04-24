@@ -9,8 +9,6 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
 {
     log.LogInformation("C# HTTP trigger function processed a request.");
 
-    string name = req.Query["name"];
-
     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
     dynamic registrationRequest = JsonConvert.DeserializeObject<RegistrationRequest> (requestBody);
     var email = registrationRequest?.Email;
