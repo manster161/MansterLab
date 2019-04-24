@@ -14,20 +14,19 @@ namespace Registration
     {
         [FunctionName("Registration")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            dynamic data = JsonConvert.DeserializeObject<RegistrationRequest>(requestBody);
+            var email  = data?.Email;
+            var userName = data?.UserName;
+            
+            return (email != null && userName != null)
+                ? (ActionResult)new OkObjectResult($"Hello, {userName}")
+                : new BadRequestObjectResult("Invalid registration data");
         }
     }
 
